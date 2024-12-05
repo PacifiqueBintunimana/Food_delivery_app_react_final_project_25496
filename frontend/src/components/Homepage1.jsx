@@ -4,103 +4,200 @@ import { Link } from "react-router-dom";
 import headerImage from "../assets/assets/image/food-background.jpg";
 import logoImage from "../assets/assets/image/food-background.jpg";
 import TopMealsCarousel from "./TopMealsCarousel";
+import { useTranslation } from "react-i18next";
+import i18n from '../i18n';
 
 const Homepage1 = () => {
   const [language, setLanguage] = useState("en");
-
-  const toggleLanguage = (lang) => {
-    setLanguage(lang);
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
   };
+  const { t } = useTranslation();
+/*
+  const styles = {
+    languageSwitcher: {
+      position: "absolute",
+      top: "10px",
+      right: "20px",
+      display: "flex",
+      gap: "10px",
+    },
+    button: {
+      padding: "8px 16px",
+      backgroundColor: "#f8f9fa",
+      border: "1px solid #ced4da",
+      borderRadius: "5px",
+      fontSize: "14px",
+      cursor: "pointer",
+      transition: "background-color 0.3s ease",
+    },
+    buttonHover: {
+      backgroundColor: "#e2e6ea",
+    },
+  };*/
+  const styles = {
+    navbar: {
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "1rem 2rem",
+      background: "#ff5722",
+      color: "#fff",
+      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+      position: "relative",
+    },
+    logoContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    },
+    logo: {
+      height: "50px",
+      width: "50px",
+    },
+    navLinks: {
+      display: "flex",
+      flexDirection: "row",
+      gap: "1.5rem",
+      listStyle: "none",
+    },
+    ul: {
+      display: "flex",
+      gap: "1.5rem",
+      listStyle: "none",
+      padding: 0,
+      margin: 0,
+    },
+    link: {
+      color: "#fff",
+      textDecoration: "none",
+    },
+    hamburger: {
+      display: "none",
+      fontSize: "1.5rem",
+      background: "none",
+      border: "none",
+      color: "#fff",
+      cursor: "pointer",
+    },
+    languageSwitcher: {
+      display: "flex",
+      gap: "0.5rem",
+    },
+    button: {
+      backgroundColor: "#fff",
+      color: "#ff5722",
+      border: "none",
+      padding: "0.5rem 1rem",
+      borderRadius: "5px",
+      cursor: "pointer",
+    },
+  };
+  
+  // Media Query for Mobile
+  const mobileStyles = `
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        background-color: #ff5722;
+        position: absolute;
+        top: 60px;
+        right: 10px;
+        padding: 1rem;
+        border-radius: 10px;
+      }
+      .nav-links ul {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .hamburger {
+        display: block;
+      }
+    }
+  `;
+  
+  // Injecting Media Query
+  const styleSheet = document.createElement("style");
+  styleSheet.type = "text/css";
+  styleSheet.innerText = mobileStyles;
+  document.head.appendChild(styleSheet);
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif", margin: 0, minHeight: "100vh" }}>
-      {/* Navbar */}
-      <nav
-        style={{
-          display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1rem 2rem",
-    background: "#ff5722",
-    color: "#fff",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-        }}
+  {/* Navbar */}
+  <nav style={styles.navbar}>
+    <div style={styles.logoContainer}>
+      <img src={logoImage} alt="Hub Logo" style={styles.logo} />
+      <h2>FoodExPress</h2>
+    </div>
+    <div
+      className="nav-links"
+      style={styles.navLinks}
+      id="nav-links"
+    >
+      <ul style={styles.ul}>
+        <li>
+          <Link to="/login" style={styles.link}>
+            {t("navbar.sign")}
+          </Link>
+        </li>
+        <li>
+          <Link to="/register" style={styles.link}>
+            {t("navbar.signup")}
+          </Link>
+        </li>
+        <li>
+          <a href="#" style={styles.link}>
+            <i className="ri-twitter-fill"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" style={styles.link}>
+            <i className="ri-facebook-circle-fill"></i>
+          </a>
+        </li>
+        <li>
+          <a href="#" style={styles.link}>
+            <i className="ri-instagram-line"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <button
+      style={styles.hamburger}
+      onClick={() => {
+        const navLinks = document.getElementById("nav-links");
+        navLinks.style.display =
+          navLinks.style.display === "block" ? "none" : "block";
+      }}
+    >
+      ☰
+    </button>
+    <div style={styles.languageSwitcher}>
+      <button
+        onClick={() => changeLanguage("en")}
+        style={styles.button}
       >
-        <div className="nav__logo" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img src={logoImage} alt="Hub Logo" style={{ height: "50px",width:"50px" }} />
-          <h2>FoodExPress</h2>
-        </div>
-        <ul
-          style={{
-            listStyle: "none",
-            display: "flex",
-            gap: "1.5rem",
-          }}
-        >
-          <li>
-            <Link to="/login" style={{ color: "#fff", textDecoration: "none" }}>
-              Login
-            </Link>
-          </li>
-          <li>
-            <Link to="/register" style={{ color: "#fff", textDecoration: "none" }}>
-              Register
-            </Link>
-          </li>
-          <li>
-            <a href="#" style={{ color: "#fff" }}>
-              <i className="ri-twitter-fill"></i>
-            </a>
-          </li>
-          <li>
-            <a href="#" style={{ color: "#fff" }}>
-              <i className="ri-facebook-circle-fill"></i>
-            </a>
-          </li>
-          <li>
-            <a href="#" style={{ color: "#fff" }}>
-              <i className="ri-instagram-line"></i>
-            </a>
-          </li>
-        </ul>
-        <div className="language-switcher" style={{ display: "flex", gap: "10px" }}>
-          <button
-            onClick={() => toggleLanguage("en")}
-            style={{
-              backgroundColor: language === "en" ? "#ffa726" : "transparent",
-              color: "#fff",
-              border: "1px solid #fff",
-              padding: "0.5rem 1rem",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            English
-          </button>
-          <button
-            onClick={() => toggleLanguage("fr")}
-            style={{
-              backgroundColor: language === "fr" ? "#ffa726" : "transparent",
-              color: "#fff",
-              border: "1px solid #fff",
-              padding: "0.5rem 1rem",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            French
-          </button>
-        </div>
-      </nav>
+        English
+      </button>
+      <button
+        onClick={() => changeLanguage("fr")}
+        style={styles.button}
+      >
+        Français
+      </button>
+    </div>
+  </nav>
+
+
 <div>
       {/* Main Content */}
       <header style={{ padding: "4rem 2rem", textAlign: "center" }}>
         <img src={headerImage} alt="Header" style={{ width: "100%", borderRadius: "8px" }} />
-        <h1>Welcome to FoodHub</h1>
-        <p> Explore a wide range of delicious cuisines, track your orders in real-time, and enjoy
-            personalized recommendations. Whether you’re craving comfort food or exploring new
-            tastes, FoodHub is here to deliver happiness to your doorstep.</p>
+        <h1>{t("home.hometitle")}</h1>
+        <p>{t("home.dihomeunder")}</p>
       
            
       </header>
@@ -195,7 +292,7 @@ const Homepage1 = () => {
       >
         {/* Contact Info */}
         <div style={{ flex: "1 1 30%" }}>
-          <h3>Contact Us</h3>
+          <h3>{t("home.homenext")}</h3>
           <p>
             <i className="ri-mail-line" style={{ marginRight: "8px" }}></i>
             <a

@@ -12,7 +12,13 @@
   
     "navbar": {
      
-      "sign_out": "Sign Out",
-      "login_signup": "Login/SignUp"
+      "sign": "Sign in",
+      "signup": "SignUp"
+    },
+    "home":{
+
+      "hometitle": "Welcome to FoodHub",
+      "dihomeunder": " Explore a wide range of delicious cuisines, track your orders in real-time, and enjoy personalized recommendations . Whether you're craving comfort food or exploring new tastes, FoodHub is here to deliver happiness to your doorstep .",
+      "homenext": "Contact Us"
     }
   }

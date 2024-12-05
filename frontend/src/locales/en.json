@@ -1,0 +1,18 @@
+{
+    "login": {
+      "welcome": "Welcome!",
+      "email": "Email",
+      "password": "Password",
+      "login": "Login",
+      "no_account": "Don't have an account?",
+      "register_here": "Register Here",
+      "error_login_failed": "Login failed",
+      "error_occurred": "An error occurred. Please try again."
+    },
+  
+    "navbar": {
+     
+      "sign_out": "Sign Out",
+      "login_signup": "Login/SignUp"
+    }
+  }

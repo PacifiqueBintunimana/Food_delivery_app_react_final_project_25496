@@ -4,10 +4,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Homepage1 from './components/Homepage1';
-import Login1 from './components/Login1';
 import Register1 from './components/Register1';
 import ForgotPassword from './components/forgotPassword';
-import ResetPassword from './components/resetPassword';
 import AdminDashboard from './components/AdminDashboard';
 // import ProtectedRoute from './components/ProtectedRoute';
 import AddUser from './components/AddUser';
@@ -22,6 +20,8 @@ import CustomerDashboard from './components/CustomerDashboard';
 import ManagerDashboard from './components/ManagerDashboard';
 import { I18nextProvider } from 'react-i18next';
 import './i18n';
+import Login1 from './components/Login1';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   return (
@@ -47,8 +47,8 @@ function App() {
         <Route path="/register" element={<Register1 />} />
         <Route path="/customerDashboard" element={<CustomerDashboard/>} />
         <Route path="/managerDashboard" element={<ManagerDashboard/>} />
-        <Route path="/forgotPassword" element={<ForgotPassword />} />
-        <Route path="/resetPassword/:token" element={<ResetPassword />} />
+        <Route path="/forgotPassword" element={<ForgotPassword/>} />
+        <Route path="/resetPassword/:token" element={<ResetPassword/>} />
         <Route path="/admin/download/users" element={<DownloadUsers />} />
         <Route path="/files/upload" element={<FileUpload />} />
         <Route path="/admin/upload/users" element={<UploadUsers />} />

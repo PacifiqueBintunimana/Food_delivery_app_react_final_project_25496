@@ -4,8 +4,7 @@ import { Link,  useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import api from './api';
 import { useTranslation } from 'react-i18next';
-import i18n from '../i18n'
-import './login.css'
+import i18n from '../i18n';
 
 // Your existing styled components remain the same
 const LoginContainer = styled.div`
@@ -199,7 +198,7 @@ const Login1 = () => {
   
   
   return (
-  <div className='banner -z-50 relative flex flex-col justify-center item-center'>
+  <div>
     <div style={styles.languageSwitcher}>
         <button
           onClick={() => changeLanguage("en")}

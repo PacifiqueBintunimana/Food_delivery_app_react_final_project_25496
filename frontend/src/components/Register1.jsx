@@ -287,6 +287,7 @@ const Register1 = () => {
     password: '',
     role: '',
   });
+  
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 

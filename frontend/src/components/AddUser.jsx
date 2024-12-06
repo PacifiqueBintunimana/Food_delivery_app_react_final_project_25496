@@ -143,8 +143,8 @@ const AddUser = () => {
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
                 <option value="">Select a role</option>
-                <option value="ROLE_USER">Student</option>
-                <option value="ROLE_TEACHER">Teacher</option>
+                <option value="ROLE_USER">customer</option>
+                <option value="ROLE_MANAGER">Manager</option>
               </select>
             </div>
 

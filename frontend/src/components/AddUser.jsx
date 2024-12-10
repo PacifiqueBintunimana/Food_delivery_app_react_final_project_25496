@@ -144,7 +144,7 @@ const AddUser = () => {
               >
                 <option value="">Select a role</option>
                 <option value="ROLE_USER">customer</option>
-                <option value="ROLE_MANAGER">Manager</option>
+                <option value="ROLE_MANAGER">manager</option>
               </select>
             </div>
 

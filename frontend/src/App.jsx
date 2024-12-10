@@ -5,7 +5,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Homepage1 from './components/Homepage1';
 import Register1 from './components/Register1';
-import ForgotPassword from './components/forgotPassword';
 import AdminDashboard from './components/AdminDashboard';
 // import ProtectedRoute from './components/ProtectedRoute';
 import AddUser from './components/AddUser';
@@ -22,6 +21,7 @@ import { I18nextProvider } from 'react-i18next';
 import './i18n';
 import Login1 from './components/Login1';
 import ResetPassword from './components/ResetPassword';
+import ForgotPassword from './components/ForgotPassword';
 
 function App() {
   return (

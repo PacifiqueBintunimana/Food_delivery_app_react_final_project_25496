@@ -107,10 +107,17 @@ NotificationDialog.propTypes = {
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
   const [notifications, setNotifications] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize] = useState(10);
+
+  const [sortKey, setSortKey] = useState(''); // Key to sort by
+  const [sortOrder, setSortOrder] = useState('asc'); // Sorting order: 'asc' or 'desc'
+  const [filter, setFilter] = useState(''); // Filter query
+
   
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationForm, setNotificationForm] = useState({
@@ -159,8 +166,25 @@ const AdminDashboard = () => {
     return () => clearInterval(interval);
     
   }, [currentPage]);
-
   const fetchUsers = async () => {
+    try {
+      // Use axios.get for the GET request, passing query parameters via `params`
+      const response = await api.get('/api/admin/users', {
+        params: {
+          page: currentPage,
+          size: pageSize,
+        },
+      });
+      
+      // Update state with the response data
+      setUsers(response.data.content || response.data);
+      setTotalPages(response.data.totalPages || 1); // Set total pages or default to 1
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  /*const fetchUsers = async () => {
     try {
       // Change to GET method since your controller doesn't have a POST endpoint for fetching users
       const response = await api.get('/api/admin/users', {
@@ -174,7 +198,7 @@ const AdminDashboard = () => {
     } catch (error) {
       console.error('Error fetching users:', error);
     }
-  };
+  };*/
 
   const fetchNotifications = async () => {
     try {
@@ -216,6 +240,42 @@ const AdminDashboard = () => {
       fetchNotifications();
     } catch (error) {
       console.error('Error marking notification as read:', error);
+    }
+  };
+  useEffect(() => {
+    // Apply filtering and sorting
+    let updatedUsers = [...users];
+
+    // Filtering
+    if (filter) {
+      updatedUsers = updatedUsers.filter((user) =>
+        Object.values(user)
+          .join(' ')
+          .toLowerCase()
+          .includes(filter.toLowerCase())
+      );
+    }
+
+    // Sorting
+    if (sortKey) {
+      updatedUsers.sort((a, b) => {
+        const aValue = a[sortKey];
+        const bValue = b[sortKey];
+        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    setFilteredUsers(updatedUsers);
+  }, [users, filter, sortKey, sortOrder]);
+
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc')); // Toggle order
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
     }
   };
 
@@ -286,24 +346,46 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        <div className="ml-64 flex-1 p-8">
+        <header className="mb-8">
+          <h3 className="text-2xl font-bold text-gray-800">Manage Users</h3>
+        </header>
+
+        {/* Filter Input */}
+        <div className="mb-4 flex justify-between items-center">
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="p-2 border rounded w-full max-w-md"
+          />
+        </div>
 
         {/* Users Table */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <table className="w-full">
-            {/* Previous table code remains the same */}
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                {['Username', 'First Name', 'Last Name', 'Email', 'Phone', 'Role'].map((header, index) => (
+                  <th
+                    key={index}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    onClick={() => handleSort(header.replace(/\s+/g, '').toLowerCase())}
+                  >
+                    {header}
+                    {sortKey === header.replace(/\s+/g, '').toLowerCase() && (
+                      <i className={`ml-2 fas fa-sort-${sortOrder === 'asc' ? 'up' : 'down'}`}></i>
+                    )}
+                  </th>
+                ))}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
+              {filteredUsers.slice(currentPage * pageSize, (currentPage + 1) * pageSize).map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">{user.username}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.firstName}</td>
@@ -312,15 +394,15 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{user.phoneNumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{user.role}</td>
                   <td className="px-6 py-4 whitespace-nowrap space-x-2">
-                    <Link 
+                    <Link
                       to={`/admin/users/edit/${user.id}`}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-black bg-yellow-300 hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:ring-offset-2 shadow-md"
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-black bg-yellow-300 hover:bg-yellow-400"
                     >
                       Edit
                     </Link>
-                    <button 
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 shadow-md"
+                    <button
                       onClick={() => handleDeleteUser(user.id)}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-red bg-red-500 hover:bg-red-600"
                     >
                       Delete
                     </button>
@@ -333,12 +415,14 @@ const AdminDashboard = () => {
 
         {/* Pagination */}
         <div className="flex justify-center mt-6">
-          <Pagination 
+          <Pagination
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={Math.ceil(filteredUsers.length / pageSize)}
             onPageChange={(page) => setCurrentPage(page)}
           />
         </div>
+      </div>
+    
 
         {/* Notifications Dialog */}
         {showNotifications && (

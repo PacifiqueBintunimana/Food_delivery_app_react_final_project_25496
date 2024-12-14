@@ -1,2 +1,2 @@
-deployment  for front end
-https://frontend-bm7sgec04-bintunimana-pacifiques-projects.vercel.app/
+deployment  for front end 
+https://frontend-git-main-bintunimana-pacifiques-projects.vercel.app/

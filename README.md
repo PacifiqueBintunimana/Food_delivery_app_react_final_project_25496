@@ -1,2 +1,2 @@
 deployment  for front end
-https://frontend-navy-eight-38.vercel.app/
+https://frontend-bm7sgec04-bintunimana-pacifiques-projects.vercel.app/

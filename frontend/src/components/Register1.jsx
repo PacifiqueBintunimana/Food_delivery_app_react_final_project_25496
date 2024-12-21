@@ -301,7 +301,7 @@ const Register1 = () => {
     setSuccessMessage('');
 
     try {
-      const response = await axios.post('http://localhost:8082/api/register', formData);
+      const response = await axios.post('https://backend-production-5369.up.railway.app/api/register', formData);
       if (response.status === 200) {
         setFormData({
           username: '',

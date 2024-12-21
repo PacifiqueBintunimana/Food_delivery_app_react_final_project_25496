@@ -16,12 +16,14 @@ import DownloadUsers from './components/DownloadUsers';
 import UploadUsers from './components/UploadUsers';
 import FileUpload from './components/FileUpload';
 import CustomerDashboard from './components/CustomerDashboard';
-import ManagerDashboard from './components/ManagerDashboard';
 import { I18nextProvider } from 'react-i18next';
 import './i18n';
 import Login1 from './components/Login1';
 import ResetPassword from './components/ResetPassword';
 import ForgotPassword from './components/ForgotPassword';
+import UploadDocuments from './components/UploadDocument';
+import UploadSuccess from './components/UploadSuccess';
+import ManagerDashboard from './components/ManagerDashboard';
 
 function App() {
   return (
@@ -39,19 +41,22 @@ function App() {
         } /> */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/add" element={<AddUser />} />
-        <Route path="/admin/users/edit/:id" element={<EditUser />} />
+        <Route path="/admin/users/edit/:userId" element={<EditUser />} />
         <Route path="/admin/search" element={<SearchUser />} />
         <Route path="/admin/users" element={<UserList />} />
         <Route path="/" element={<Homepage1 />} />
         <Route path="/login" element={<Login1 />} />
         <Route path="/register" element={<Register1 />} />
-        <Route path="/customerDashboard" element={<CustomerDashboard/>} />
-        <Route path="/managerDashboard" element={<ManagerDashboard/>} />
+        <Route path="/customer" element={<CustomerDashboard/>} />
+        <Route path="/manager" element={<ManagerDashboard/>} />
         <Route path="/forgotPassword" element={<ForgotPassword/>} />
-        <Route path="/resetPassword/:token" element={<ResetPassword/>} />
+        <Route path="/resetPassword" element={<ResetPassword/>} />
         <Route path="/admin/download/users" element={<DownloadUsers />} />
         <Route path="/files/upload" element={<FileUpload />} />
         <Route path="/admin/upload/users" element={<UploadUsers />} />
+        <Route path="/admin/upload" element={<UploadDocuments />} /> {/* Upload Documents route */}
+        <Route path="/success" element={<UploadSuccess />} />
+        <Route path="/user-list" element={<UserList />} />
 
       </Routes>
     </Router>

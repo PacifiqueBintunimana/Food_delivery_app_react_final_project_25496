@@ -1,170 +1,186 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
+
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CustomerDashboard = () => {
-  const [notifications, setNotifications] = useState([]);
-  const navigate = useNavigate();
+const CustomerDashboard = ({ employee = {}, orders = [],foodListings = [], onLogout }) => {
+ // States for editable fields
+ const [isAvailable, setIsAvailable] = useState(employee.isAvailable || false);
+ const [email, setEmail] = useState(employee.email || "");
+ const [phone, setPhone] = useState(employee.phone || "");
+ const [linkedIn, setLinkedIn] = useState(employee.linkedIn || "");
 
-  useEffect(() => {
-    fetchUserNotifications();
-    fetchDashboardData();
-  }, []);
+ const handleAvailabilityToggle = () => {
+   setIsAvailable(!isAvailable);
+ };
 
-  const fetchDashboardData = async () => {
-    try {
-      const dashboardData = await axios.get('/api/customerDashboard');
-      // Handle dashboard data
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    }
-  };
+ return (
+   <div style={styles.container}>
+     {/* Profile Overview Section */}
+     <div style={styles.profileOverview}>
+       <img src={employee.profilePicture || "/default-profile.png"} alt="Profile" style={styles.profileImage} />
+       <div>
+         <h2>{employee.name || "Guest"}</h2>
+         <p><strong>Position:</strong> {employee.position || "Not Specified"}</p>
+       </div>
+     </div>
 
-  const fetchUserNotifications = async () => {
-    try {
-      const response = await axios.get('/api/notifications/user/unread');
-      if (Array.isArray(response.data)) {
-        setNotifications(response.data);
-        await markAllNotificationsAsRead();
-      } else {
-        setNotifications([]);
-      }
-    } catch (error) {
-      console.log('Error fetching notifications:', error);
-      setNotifications([]);
-    }
-  };
+     {/* food exprienc Section */}
+     <div style={styles.section}>
+       <h2 style={styles.sectionHeading}>experience</h2>
+       <ul>
+         {employee.skills && employee.skills.length > 0 ? (
+           employee.skills.map((skill, index) => (
+             <li key={index} style={styles.listItem}>
+               {skill}
+             </li>
+           ))
+         ) : (
+           <li style={styles.listItem}>No experience listed.</li>
+         )}
+       </ul>
+     </div>
 
-  const markAllNotificationsAsRead = async () => {
-    try {
-      await axios.put('/api/notifications/user/mark-all-as-read');
-    } catch (error) {
-      console.log('Error marking notifications as read:', error);
-    }
-  };
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.clear();
-    navigate('/login');
-  };
+     {/*  History Section */}
+     <div style={styles.section}>
+       <h2 style={styles.sectionHeading}> History</h2>
+       <ul>
+         {employee.jobHistory && employee.jobHistory.length > 0 ? (
+           employee.jobHistory.map((job, index) => (
+             <li key={index} style={styles.listItem}>
+               <strong>{job.role}</strong> at {job.company} ({job.years} years)
+             </li>
+           ))
+         ) : (
+           <li style={styles.listItem}>No  history available.</li>
+         )}
+       </ul>
+     </div>
 
-  const dashboardStyle = {
-    background: 'linear-gradient(135deg, #001f3f, #0074d9)',
-    minHeight: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    animation: 'fadeIn 1s ease'
-  };
+     {/* Availability Toggle */}
+     <div style={styles.section}>
+       <h2 style={styles.sectionHeading}>Availability</h2>
+       <p>{isAvailable ? "You are currently available for new opportunities." : "You are currently unavailable."}</p>
+       <button onClick={handleAvailabilityToggle} style={styles.button}>
+         {isAvailable ? "Mark as Unavailable" : "Mark as Available"}
+       </button>
+     </div>
 
-  const contentStyle = {
-    backgroundColor: '#003366',
-    padding: '2rem',
-    maxWidth: '800px',
-    width: '100%',
-    borderRadius: '10px',
-    boxShadow: '0 10px 20px rgba(0, 0, 0, 0.3)',
-    textAlign: 'center',
-    color: '#e0f7fa'
-  };
+     {/* Contact Info Section */}
+     <div style={styles.section}>
+       <h2 style={styles.sectionHeading}>Contact Information</h2>
+       <p><strong>Email:</strong> <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={styles.input} /></p>
+       <p><strong>Phone:</strong> <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} style={styles.input} /></p>
+       <p><strong>instagram:</strong> <input type="text" value={linkedIn} onChange={(e) => setLinkedIn(e.target.value)} style={styles.input} /></p>
+     </div>
 
-  return (
-    <div style={dashboardStyle}>
-      <div style={contentStyle}>
-        <h1>Customer Dashboard .Welcome to Food Delivery!</h1>
-        <p className="welcome-message">
-          Your personal hub for managing orders, tracking your orders.
-        </p>
+     {/* Job Application Status Section */}
+     <div style={styles.section}>
+       <h2 style={styles.sectionHeading}>food order Status</h2>
+       <p>Here is the status of your food you have ordered:</p>
+       <ul>
+         {orders.length > 0 ? (
+          orders.map((application, index) => (
+             <li key={index} style={styles.listItem}>
+               <strong>{application.jobTitle}</strong> - {application.status}
+             </li>
+           ))
+         ) : (
+           <li style={styles.listItem}>No orders found.</li>
+         )}
+       </ul>
+     </div>
 
-        <div className="order-summary">
-          <h2>your orders available</h2>
-          <p>Manage and track your food orders with ease</p>
-          
-          <Link to="/orders/current" className="btn">Current Orders</Link>
-          <Link to="/orders/history" className="btn">Order History</Link>
-        </div>
+     {/* food Listings Section */}
+     <div style={styles.section}>
+       <h2 style={styles.sectionHeading}>Available food Listings</h2>
+       <p>Browse and order for new food within the restaurant:</p>
+       <ul>
+         {foodListings.length > 0 ? (
+           foodListings.map((food, index) => (
+             <li key={index} style={styles.listItem}>
+               <strong>{food.name}</strong> - {food.restaurant} -{" "}
+               <a href={`/food/${food.id}`} style={styles.button}>
+                 View food
+               </a>
+             </li>
+           ))
+         ) : (
+           <li style={styles.listItem}>No food listings available.</li>
+         )}
+       </ul>
+     </div>
 
-        <div className="restaurant-section">
-          <h2>Explore Restaurants</h2>
-          <p>Discover new cuisines and your favorite local eateries.</p>
-          <Link to="/restaurants" className="btn">Browse Restaurants</Link>
-          <Link to="/restaurants/favorites" className="btn">Favorite Restaurants</Link>
-        </div>
+     {/* Logout Button */}
+     <button onClick={onLogout} style={styles.logoutButton}>
+       Logout
+     </button>
+   </div>
+ );
+};
 
-        <div className="profile-management">
-        <h2>Profile & Settings</h2>
-          <p>Update your profile, payment methods, and delivery preferences.</p>
-          <Link to="/profile" className="btn">Edit Profile</Link>
-          <Link to="/addresses" className="btn">Manage Addresses</Link>
-        </div>
-
-        <div id="user-notifications">
-          <h3>Notifications <span>{notifications.length}</span></h3>
-          <div>
-            {notifications && notifications.length > 0 ? (
-              notifications.map((notification, index) => (
-                <div key={index} className="notification-item">
-                  <strong>{notification.title}</strong>
-                  <p>{notification.message}</p>
-                </div>
-              ))
-            ) : (
-              <p>No new notifications</p>
-            )}
-          </div>
-        </div>
-
-        <button onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
-
-      <style>
-      {`
-          @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-
-          @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-
-          .btn {
-            display: inline-block;
-            margin: 0.5rem;
-            padding: 10px 20px;
-            background-color: #ff4500;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.3s;
-          }
-
-          .btn:hover {
-            background-color: #ff6347;
-            transform: scale(1.05);
-          }
-
-          .logout-btn {
-            background-color: #dc143c;
-          }
-
-          .logout-btn:hover {
-            background-color: #b22222;
-          }
-
-          .notification-item {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #ffa07a;
-            animation: slideIn 0.5s ease forwards;
-          }
-        `}
-      </style>
-    </div>
-  );
+// Inline Styles for the React Component
+const styles = {
+ container: {
+   width: "80%",
+   margin: "auto",
+   fontFamily: "Arial, sans-serif",
+   backgroundColor: "#f4f7fc",
+   padding: "20px",
+ },
+ profileOverview: {
+   display: "flex",
+   alignItems: "center",
+   marginBottom: "20px",
+ },
+ profileImage: {
+   borderRadius: "50%",
+   width: "100px",
+   height: "100px",
+   marginRight: "20px",
+ },
+ section: {
+   backgroundColor: "white",
+   padding: "15px",
+   borderRadius: "5px",
+   marginBottom: "20px",
+   boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+ },
+ sectionHeading: {
+   color: "#007bff",
+   marginBottom: "10px",
+ },
+ listItem: {
+   margin: "10px 0",
+ },
+ button: {
+   backgroundColor: "#007bff",
+   color: "white",
+   padding: "10px 20px",
+   borderRadius: "5px",
+   textDecoration: "none",
+   display: "inline-block",
+   border: "none",
+   cursor: "pointer",
+ },
+ logoutButton: {
+   marginTop: "20px",
+   padding: "10px 20px",
+   backgroundColor: "#dc3545",
+   color: "white",
+   borderRadius: "5px",
+   border: "none",
+   cursor: "pointer",
+ },
+ input: {
+   padding: "5px",
+   marginTop: "5px",
+   borderRadius: "5px",
+   width: "200px",
+   border: "1px solid #ccc",
+ },
 };
 
 export default CustomerDashboard;

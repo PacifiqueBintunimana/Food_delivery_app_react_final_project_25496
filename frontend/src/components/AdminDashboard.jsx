@@ -78,7 +78,7 @@ const NotificationDialog = ({ notifications, onClose, onSend, formData, setFormD
           />
           <button
             onClick={onSend}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            className="w-full bg-blue-600 text-black py-2 rounded hover:bg-blue-700"
           >
             Send Notification
           </button>
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
   const fetchUsers = async () => {
     try {
       // Use axios.get for the GET request, passing query parameters via `params`
-      const response = await api.get('/api/admin/users', {
+      const response = await api.get('/admin/users', {
         params: {
           page: currentPage,
           size: pageSize,
@@ -202,7 +202,7 @@ const AdminDashboard = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await api.get('/api/admin/notifications');
+      const response = await api.get('/notifications');
       setNotifications(response.data);
 
     } catch (error) {
@@ -214,7 +214,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await api.delete(`/api/admin/users/${userId}`);
+        await api.delete(`/admin/users/${userId}`);
         fetchUsers();
       } catch (error) {
         console.error('Error deleting user:', error);
@@ -224,7 +224,7 @@ const AdminDashboard = () => {
 
   const handleSendNotification = async () => {
     try {
-      await api.post('/api/admin/notifications', notificationForm);
+      await api.post('/notifications', notificationForm);
       setNotificationForm({ title: '', message: '' });
       fetchNotifications();
     } catch (error) {
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
 
   const handleMarkAsRead = async (notificationId) => {
     try {
-      await fetch(`/api/admin/notifications/${notificationId}/mark-read`, {
+      await fetch(`/api/notifications/${notificationId}/mark-read`, {
         method: 'PUT',
       });
       fetchNotifications();
@@ -278,6 +278,9 @@ const AdminDashboard = () => {
       setSortOrder('asc');
     }
   };
+  const handleClearNotifications = () => {
+    setNotifications([]);
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -300,6 +303,15 @@ const AdminDashboard = () => {
             <i className="fas fa-download mr-3"></i>
             <span>Download Data</span>
           </Link>
+          <Link to="/admin/upload" className="btn btn-primary">
+          <i className="fas fa-upload mr-3"></i>
+          <span>Upload File</span>
+          </Link>
+          <Link to="/admin/users" className="nav-link">
+          <i className="fas fa-upload mr-3"></i>
+          <span>User Management</span></Link>
+
+          
 
           <Link to= "/files/upload" className="flex items-center p-3 mb-2 hover:bg-[#176B87] rounded-lg transition-colors">
             <i className="fas fa-upload mr-3"></i>
@@ -423,7 +435,7 @@ const AdminDashboard = () => {
         </div>
       </div>
     
-
+<div>
         {/* Notifications Dialog */}
         {showNotifications && (
           <NotificationDialog
@@ -434,6 +446,30 @@ const AdminDashboard = () => {
             setFormData={setNotificationForm}
           />
         )}
+        </div>
+         {/* Notifications Section */}
+         <div className="mb-4">
+            <h5>Notifications</h5>
+            <table className="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Message</th>
+                  <th>Date & Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {notifications.map((notification, index) => (
+                  <tr key={index}>
+                    <td>{notification.message}</td>
+                    <td>{new Date(notification.timestamp).toLocaleString()}</td>
+                    <td>{notification.read ? 'Read' : 'Unread'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={handleClearNotifications} className="btn btn-secondary">Clear All Notifications</button>
+          </div>
       </div>
     </div>
   );

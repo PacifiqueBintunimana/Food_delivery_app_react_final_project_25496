@@ -1,140 +1,108 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-// import axios from 'axios';
-import { authService } from './auth';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 const ResetPassword = () => {
-  const { token } = useParams();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmNewPassword: ''
-  });
-  const [message, setMessage] = useState('');
+  const location = useLocation();
+  const token = new URLSearchParams(location.search).get('token'); // Extract token from the URL.
+
+  const [formData, setFormData] = useState({ newPassword: '', confirmNewPassword: '' });
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [isTokenValid, setIsTokenValid] = useState(false);
+
+  useEffect(() => {
+    // Validate the token before allowing password reset form to load
+    const validateToken = async () => {
+      try {
+        const response = await axios.get(`https://backend-production-5369.up.railway.app/api/reset-password?token=${token}`);
+        if (response.data.message === 'Token is valid.') {
+          setIsTokenValid(true);
+        } else {
+          setError('Invalid or expired token.');
+        }
+      } catch (error) {
+        setError('Token validation failed.');
+      }
+    };
+
+    validateToken();
+  }, [token]);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setMessage('');
+
+    // Validate password fields
     if (formData.newPassword !== formData.confirmNewPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
+      return;
+    }
+
+    if (!formData.newPassword || !formData.confirmNewPassword) {
+      setError('Password fields cannot be empty.');
       return;
     }
 
     try {
-      const response = await authService.resetPassword(token, formData.newPassword);
-      setMessage('Password reset successful!');
-      setTimeout(() => navigate('/login'), 2000);
-  } catch (err) {
-      setError(err.response?.data?.error || 'Unable to reset password. Please try again.');
-  }
-  
+      // Make API request to reset password
+      const response = await axios.post('https://backend-production-5369.up.railway.app/api/reset-password', {
+        token,
+        newPassword: formData.newPassword,
+        confirmNewPassword: formData.confirmNewPassword,
+      });
+      setMessage(response.data.message || 'Password reset successful!');
+      
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate('/login'); // Redirect to login page
+      }, 2000);
+    } catch (error) {
+      setError(error.response?.data?.error || 'Password reset failed.');
+    }
   };
 
   return (
-    <section style={{
-      fontFamily: 'Arial, sans-serif',
-      margin: 0,
-      padding: 0,
-      background: 'linear-gradient(135deg, #6a11cb, #2575fc)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      color: '#ffffff'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '450px',
-        background: '#ffffff',
-        borderRadius: '10px',
-        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
-        overflow: 'hidden',
-        textAlign: 'center',
-        padding: '2rem',
-        color: '#333'
-      }}>
-        <div className="motivational-text">
-          <h2 style={{ fontSize: '1.8rem', color: '#2575fc', marginBottom: '0.5rem' }}>
-            Reset Your Password
-          </h2>
-          <p style={{ color: '#666', fontSize: '1rem', marginBottom: '1rem' }}>
-            We understand that forgetting your password can be frustrating.
-          </p>
-          <p style={{ color: '#666', fontSize: '1rem', marginBottom: '1rem' }}>
-            Enter your new password below to regain access to your account.
-          </p>
-        </div>
-
-        {error && <div style={{ color: '#d9534f', background: '#f2dede', padding: '0.5rem', borderRadius: '5px', marginBottom: '1rem' }}>{error}</div>}
-        {message && <div style={{ color: '#5cb85c', background: '#dff0d8', padding: '0.5rem', borderRadius: '5px', marginBottom: '1rem' }}>{message}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
-            <label htmlFor="newPassword">New Password:</label>
+    <div className="reset-password-page">
+      {isTokenValid ? (
+        <>
+          <h2>Reset Password</h2>
+          <form onSubmit={handleSubmit}>
             <input
               type="password"
-              id="newPassword"
+              name="newPassword"
+              placeholder="New Password"
               value={formData.newPassword}
               onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '0.7rem',
-                marginTop: '0.5rem',
-                border: '1px solid #ddd',
-                borderRadius: '5px'
-              }}
               required
             />
-          </div>
-
-          <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
-            <label htmlFor="confirmNewPassword">Confirm New Password:</label>
             <input
               type="password"
-              id="confirmNewPassword"
+              name="confirmNewPassword"
+              placeholder="Confirm New Password"
               value={formData.confirmNewPassword}
               onChange={handleChange}
-              style={{
-                width: '100%',
-                padding: '0.7rem',
-                marginTop: '0.5rem',
-                border: '1px solid #ddd',
-                borderRadius: '5px'
-              }}
               required
             />
-          </div>
-
-          <button type="submit" style={{
-            width: '100%',
-            padding: '0.7rem',
-            backgroundColor: '#2575fc',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            marginTop: '1rem'
-          }}>
-            Reset Password
-          </button>
-        </form>
-
-        <p style={{ marginTop: '1rem' }}>
-          <Link to="/login" style={{ color: '#2575fc', textDecoration: 'none' }}>
-            Return to login
-          </Link>
-        </p>
-      </div>
-    </section>
+            <button type="submit">Reset Password</button>
+          </form>
+        </>
+      ) : (
+        <p className="error">Invalid or expired token.</p>
+      )}
+      {error && <p className="error">{error}</p>}
+      {message && <p className="message">{message}</p>}
+    </div>
   );
 };
 
 export default ResetPassword;
+

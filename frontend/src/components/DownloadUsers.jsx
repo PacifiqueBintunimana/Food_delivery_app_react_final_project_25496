@@ -8,7 +8,7 @@ const DownloadUsers = () => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/admin/download/users', {
+      const response = await api.get('/admin/download/users', {
         responseType: 'blob',
         headers: {
           'Accept': 'application/octet-stream'

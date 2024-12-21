@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/prop-types */
+import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const EditUser = () => {
+const EditUser = ({ userId }) => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [formData, setFormData] = useState({
+  const [user, setUser] = useState({
     username: '',
     password: '',
     firstName: '',
@@ -14,152 +14,81 @@ const EditUser = () => {
     phoneNumber: '',
     role: ''
   });
+  const [message, setMessage] = useState('');
 
+  // Fetch user details when the component mounts or userId changes
   useEffect(() => {
-    fetchUser();
-  }, [id]);
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`https://backend-production-5369.up.railway.app/api/admin/users/${userId}`);
+        setUser(response.data);
+      } catch (error) {
+        setMessage('Error fetching user data');
+        console.error('Error:', error);
+      }
+    };
 
-  const fetchUser = async () => {
-    try {
-      const response = await fetch(`/api/users/${id}`);
-      const data = await response.json();
-      setFormData(data);
-    } catch (error) {
-      console.error('Error fetching user:', error);
+    if (userId) {
+      fetchUser();
     }
+  }, [userId]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8082/api/users/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        navigate('/admin');
-      }
+      await axios.post('https://backend-production-5369.up.railway.app/api/admin/users/update', user);
+      setMessage('User updated successfully!');
+      navigate('/admin');
     } catch (error) {
-      console.error('Error updating user:', error);
+      setMessage('Error updating user');
+      console.error('Error:', error);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-600 to-yellow-400 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-xl overflow-hidden">
         <div className="px-6 py-8">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
-            Edit User
-          </h2>
-          
+          <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">Edit User</h2>
+
+          {message && <p className="text-center text-red-500 mb-4">{message}</p>}
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
-              <input
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-              />
-            </div>
+            {['username', 'password', 'firstName', 'lastName', 'email', 'phoneNumber'].map((field) => (
+              <div className="mb-3" key={field}>
+                <label htmlFor={field} className="form-label capitalize">{field.replace(/([A-Z])/g, ' $1')}</label>
+                <input
+                  type={field === 'email' ? 'email' : 'text'}
+                  id={field}
+                  name={field}
+                  className="form-control"
+                  value={user[field]}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+            ))}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Leave blank to keep current password"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                First Name
-              </label>
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Role
-              </label>
+            <div className="mb-3">
+              <label htmlFor="role" className="form-label">Role</label>
               <select
+                id="role"
                 name="role"
-                value={formData.role}
-                onChange={handleChange}
+                className="form-select"
+                value={user.role}
+                onChange={handleInputChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
               >
-                <option value="">Select a role</option>
-                <option value="ROLE_USER">customer</option>
+                <option value="" disabled>Select a role</option>
+                <option value="ROLE_USER">Customer</option>
                 <option value="ROLE_MANAGER">Manager</option>
                 <option value="ROLE_ADMIN">Admin</option>
               </select>
@@ -188,3 +117,4 @@ const EditUser = () => {
 };
 
 export default EditUser;
+

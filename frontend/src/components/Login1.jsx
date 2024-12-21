@@ -144,7 +144,7 @@ const Login1 = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/login', formData);
+      const response = await api.post('/login', formData);
       console.log('Server response:', response.data);
       
       const role = response.data;
@@ -157,17 +157,18 @@ const Login1 = () => {
       localStorage.setItem('isAuthenticated', 'true');
       
       switch(role) {
-        case 'ROLE_USER':
-          navigate('/customerDashboard');
+        case "ROLE_USER":
+          navigate("/customer");
           break;
-        case 'ROLE_ADMIN':
-          navigate('/admin');
+          case "ROLE_MANAGER":
+          navigate("/manager");
           break;
-        case 'ROLE_MANAGER':
-          navigate('/managerDashboard');
+        case "ROLE_ADMIN":
+          navigate("/admin");
           break;
+        
         default:
-          navigate('/');
+          navigate("/");
       }
       
     } catch (error) {

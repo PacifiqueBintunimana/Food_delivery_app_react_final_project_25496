@@ -9,7 +9,7 @@ const SearchUser = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await api.get(`/api/admin/search/results`, {
+      const response = await api.get(`/admin/search/results`, {
         params: { query: searchTerm }
       });
       // eslint-disable-next-line no-undef

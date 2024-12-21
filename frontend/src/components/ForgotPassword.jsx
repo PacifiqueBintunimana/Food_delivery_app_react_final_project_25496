@@ -1,94 +1,150 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { authService } from './auth';
+import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-        const response = await authService.forgotPassword(email);
-        setMessage('Success! Reset link has been sent to your email. Please check your inbox.');
-        setEmail('');
-    } catch (error) {
-        console.log('Request data:', { email });
-        
-        if (error.response) {
-            setMessage(error.response.data.error || 'Server error. Please try again.');
-        } else if (error.request) {
-            setMessage('Network error. Please check your connection.');
-        } else {
-            setMessage('An unexpected error occurred. Please try again.');
-        }
-    }
-};
+    setError('');
+    setMessage('');
 
-  
+    if (!email) {
+      setError('Email is required.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('https://backend-production-5369.up.railway.app/api/forgot-password', { email });
+      setMessage(response.data.message || 'Password reset link sent to your email!');
+      
+      // Navigate to the login page after sending the reset link
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (error) {
+      setError(error.response?.data?.error || 'Failed to send reset link.');
+    }
+  };
 
   return (
-    <div style={{
-      fontFamily: 'Arial, sans-serif',
-      backgroundColor: '#f9f9f9',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      margin: 0
-    }}>
-      <h1>Forgot Password</h1>
-      {message && <div style={{ margin: '10px 0' }}>{message}</div>}
-      
-      <form onSubmit={handleSubmit} style={{
-        backgroundColor: '#fff',
-        padding: '20px',
-        borderRadius: '5px',
-        boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'
-      }}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              marginBottom: '10px',
-              padding: '10px',
-              border: '1px solid #ccc',
-              borderRadius: '3px',
-              width: '200px'
-            }}
-          />
-        </div>
-        
-        <button type="submit" style={{
-          padding: '10px',
-          backgroundColor: '#007BFF',
-          color: 'white',
-          border: 'none',
-          borderRadius: '3px',
-          cursor: 'pointer',
-          width: '100%'
-        }}>
-          Send Reset Link
-        </button>
-      </form>
+    <div className="forgot-password-page">
+      <style>
+        {`
+          body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
 
-      <p style={{ marginTop: '15px' }}>
-        <Link to="/login" style={{
-          color: '#007BFF',
-          textDecoration: 'none'
-        }}>
-          Remembered your password? Log in
-        </Link>
-      </p>
+          .forgot-password-page {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+          }
+
+          h2 {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+          }
+
+          label {
+            font-size: 1.2em;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+            text-align: left;
+          }
+
+          input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+          }
+
+          input:focus {
+            border-color: #007bff;
+            outline: none;
+          }
+
+          button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+          }
+
+          button:hover {
+            background-color: #0056b3;
+          }
+
+          .error {
+            color: #e74c3c;
+            font-size: 1.1em;
+            margin-top: 10px;
+          }
+
+          .message {
+            color: #2ecc71;
+            font-size: 1.1em;
+            margin-top: 10px;
+          }
+
+          p {
+            font-size: 1.1em;
+            margin-top: 20px;
+          }
+
+          a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+          }
+
+          a:hover {
+            text-decoration: underline;
+          }
+        `}
+      </style>
+
+      <h2>Forgot Password</h2>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="email">Enter your email address:</label>
+        <input
+          type="email"
+          id="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit">Send Reset Link</button>
+      </form>
+      {error && <p className="error">{error}</p>}
+      {message && <p className="message">{message}</p>}
     </div>
   );
 };

@@ -25,15 +25,15 @@ export const authService = {
         return api.post('/logout');
     },
     
-    forgotPassword: (email) => api.post('/api/auth/forgotPassword', null, {
+    forgotPassword: (email) => api.post('/auth/forgotPassword', null, {
         params: {
             email: email
-        },
-        timeout: 15000
+        }
+        //timeout: 15000
     }),
     
     resetPassword: (token, newPassword) => 
-        api.post(`/api/auth/resetPassword/${token}`, {
+        api.post(`/api/reset-Password/$ {token}`, {
             newPassword: newPassword,
             confirmNewPassword: newPassword
         }),
@@ -45,29 +45,29 @@ export const authService = {
 
     // New admin-specific methods
     getUsers: (page, size) => 
-        api.get('/api/admin/users', {
+        api.get('/admin/users', {
             params: { page, size }
         }),
 
     deleteUser: (userId) => 
-        api.delete(`/api/admin/users/${userId}`),
+        api.delete(`/admin/users/${userId}`),
 
     updateUser: (userId, userData) => 
-        api.put(`/api/admin/users/${userId}`, userData),
+        api.put(`/admin/users/${userId}`, userData),
 
     addUser: (userData) => 
-        api.post('/api/admin/users', userData),
+        api.post('/admin/users', userData),
 
     userUpload: (userData) => 
-        api.post('/api/admin/upload/users', userData),
+        api.post('/admin/upload/users', userData),
     FileUpload: (userData) => 
-        api.post('/api/files/upload', userData),
+        api.post('/admin/files/upload', userData),
 
     downloadUsers: (userData) => 
-        api.get('/api/admin/download/users', userData),
+        api.get('/admin/download/users', userData),
 
     searchUsers: (query) => 
-        api.get('/api/admin/search/results', {
+        api.get('/admin/search/results', {
             params: { query }
         })
 };

@@ -1,6 +1,6 @@
 deployment  for front end and backend
-https://backend-production-5369.up.railway.app
-https://frontend-git-main-bintunimana-pacifiques-projects.vercel.app/
+https://backend-production-5369.up.railway.app/
+https://frontend-git-main-bintunimana-pacifiques-projects.vercel.app/](https://frontend-oe5o2ofrx-bintunimana-pacifiques-projects.vercel.app/
 here is pages 
 <img width="391" alt="home page" src="https://github.com/user-attachments/assets/b64d718c-6420-4faf-880a-f2aa99eeb1f4" />
 language transilation
